@@ -34,7 +34,7 @@ $(function() {
 		return rawArray;
 	}
 	
-	//generqate heatmap coordinates with their coresponsinf value of the users choice
+	//generate heatmap coordinates with their coresponsding value of the users choice
 	/*
 		attribute1 -> first array to dertermine rows. Array
 		attribute2 -> second array to determine columns. Array
@@ -107,10 +107,54 @@ $(function() {
 	/*
 		
 	*/
-	function truncate(){
+	function truncate(attribute1, attribute2, mappped, values, band){
+		var truncatedArray = [];
+		var num = 0;
+		var counter = 0;
 		
+		for(var i = 0; i < mappped.length; i++){
+			for(var k = 0; k < attribute2.length; k++){
+				for(var j = 0; j < band; j++){
+					num += mappped[i][attribute2[k]][attribute1[j + (k * band)]];
+					
+				}
+			
+			}
+			
+		}
+		
+		
+		
+		return truncatedArray;
 	}
 	
+	
+	var initialise = true;
+	var thresholds = [];
+	
+	function getColour(coords, c, base, slice, gap){
+		var max = d3.max(coords, function(d){return parseInt(d.value);});
+		//var max = 0;
+
+		if(initialise){
+			slice++;
+			for(var t = 0; t < slice * 2 - 1; t++){
+				thresholds[t] = Math.ceil(base * (1 - (gap * (slice - (t + 1)) / 100)));
+			}
+			initialise = false;
+			console.log(thresholds);
+		}
+
+//										for(var tt = 0; tt < thresholds.length; tt++){
+//											if(thresholds[tt + 1] > c && thresholds[tt] < c){
+//												max = thresholds[tt];
+//											}
+//										}
+
+		var percentage = c * 100 / max;
+		var p = percentage * 2.55;
+		return "rgb(0, " + Math.ceil(p) + ", 0)";
+	}
 	
 	d3.json("data/education_town_2016.json", function(error, education_town_2016){
 		if(error !== null){console.log("Unable to laod education_town_2016 JSON file");}
@@ -187,48 +231,48 @@ $(function() {
 									
 									//get object of regions
 									
-									//get object of median values
-									var income_region_medians = IR.dataset.dimension.Region.category.label;
-									
-									//get object of years
-									var income_year_medians = IR.dataset.dimension.Year.category.label;
-									
-									//get object of income value types
-									var income_type_medians = IR.dataset.dimension.Statistic.category.label;
-									
-									//get value array for mean income
-									var income_median_values = IR.dataset.value;
-									
-									var incomeMedianByRegion = {};
-									incomeMedianByRegion.regions = getData(income_region_medians, "values");
-									incomeMedianByRegion.medians = getData(income_type_medians, "values");
-									incomeMedianByRegion.years = getData(income_year_medians, "values");
-									incomeMedianByRegion.mapped = masterArray(income_year_medians, income_type_medians, income_region_medians, "keys", "values", income_median_values);
-									incomeMedianByRegion.values = income_values_raw;
+//									//get object of median values
+//									var income_region_medians = IR.dataset.dimension.Region.category.label;
+//									
+//									//get object of years
+//									var income_year_medians = IR.dataset.dimension.Year.category.label;
+//									
+//									//get object of income value types
+//									var income_type_medians = IR.dataset.dimension.Statistic.category.label;
+//									
+//									//get value array for mean income
+//									var income_median_values = IR.dataset.value;
+//									
+//									var incomeMedianByRegion = {};
+//									incomeMedianByRegion.regions = getData(income_region_medians, "values");
+//									incomeMedianByRegion.medians = getData(income_type_medians, "values");
+//									incomeMedianByRegion.years = getData(income_year_medians, "values");
+//									incomeMedianByRegion.mapped = masterArray(income_year_medians, income_type_medians, income_region_medians, "keys", "values", income_median_values);
+//									incomeMedianByRegion.values = income_values_raw;
 									
 									
 									//
 									// Population at Each Census 1841 to 2016 by County, Sex and CensusYear
 									//
 									
-									//get object of counties
-									var population_by_county = PC.dataset.dimension.County.category.label;
-									
-									//get object of years
-									var population_by_year = PC.dataset.dimension["Census Year"].category.label;
-									
-									//get population_by_sex
-									var population_by_sex = PC.dataset.dimension.Sex.category.label;
-									
-									//get populsation values
-									var population_total = PC.dataset.value;
-									
-									var populationCounties = {};
-									populationCounties.counties = getData(population_by_county, "values");
-									populationCounties.sex = getData(population_by_sex, "values");
-									populationCounties.years = getData(population_by_year, "values");
-									populationCounties.mapped = masterArray(population_by_sex, population_by_year, population_by_county, "values", "values", population_total);
-									populationCounties.values = population_total;
+//									//get object of counties
+//									var population_by_county = PC.dataset.dimension.County.category.label;
+//									
+//									//get object of years
+//									var population_by_year = PC.dataset.dimension["Census Year"].category.label;
+//									
+//									//get population_by_sex
+//									var population_by_sex = PC.dataset.dimension.Sex.category.label;
+//									
+//									//get populsation values
+//									var population_total = PC.dataset.value;
+//									
+//									var populationCounties = {};
+//									populationCounties.counties = getData(population_by_county, "values");
+//									populationCounties.sex = getData(population_by_sex, "values");
+//									populationCounties.years = getData(population_by_year, "values");
+//									populationCounties.mapped = masterArray(population_by_sex, population_by_year, population_by_county, "values", "values", population_total);
+//									populationCounties.values = population_total;
 									
 									
 									
@@ -248,28 +292,52 @@ $(function() {
 									//get all values
 									var crime_total = CR_Q.dataset.value;
 									
+									console.log(yearly_quarters);
+									
 									var crimeDivision = {};
 									
-									console.log(crime_type);
-									
-									crimeDivision.crimeType = getData(crime_type, "values");
-									crimeDivision.yearQuarter = getData(yearly_quarters, "values");
 									crimeDivision.regions = getData(garda_division, "values");
-									crimeDivision.values = crime_total;
+									crimeDivision.crimeType = getData(crime_type, "values");
+									crimeDivision.crimeIndex = getData(crime_type, "keys");
+									crimeDivision.yearQuarter = getData(yearly_quarters, "values");
 									crimeDivision.mapped = masterArray(crime_type, yearly_quarters, garda_division, "values", "values", crime_total);
+									crimeDivision.values = crime_total;
 									
 									
+									//trancate quarterly to anually, garda division to county
+									var truncateCrime = {};
 									
-									console.log(populationCounties);
+									//console.log(testArray);
+									
+									var allCrimeArray = [];
+									for(var qq = 0 ; qq < crimeDivision.crimeIndex.length; qq++){
+
+										if(qq < 16){
+
+											if(crime_type[qq * 100] !== undefined){
+												allCrimeArray.push(crime_type[qq * 100]);
+											}
+
+										}
+									}
+									console.log(allCrimeArray);
+									
+									var testArray = truncate(crimeDivision.yearQuarter, allCrimeArray, crimeDivision.mapped, crimeDivision.values, 4);
+									console.log(testArray);
+									
+									var pick = crimeDivision.mapped[0]["Homicide offences"]["2005Q4"];
+									console.log(pick);
+									
+									//console.log(populationCounties);
 									console.log(incomeByCounty);
 									console.log(crimeDivision);
 									
 									
 									//graphing of the data
-									var thing = d3.select("body").append("svg").attr("width", 1000).attr("height", 1000);
-
 									var svgHeight = 1000;
 									var svgWidth = 1000;
+									
+									var thing = d3.select("body").append("svg").attr("width", svgWidth).attr("height", svgHeight);
 									
 									var itemSize = 25;
 									var cellSize = itemSize - 1;
@@ -315,33 +383,9 @@ $(function() {
 									
 									averageDisposableIncome = Math.ceil(totalDisposableIncome / incomeByCounty_coords.length);
 									
-									var initialise = true;
-									var thresholds = [];
 									
 									
-									function getColour(c, base, slice, gap){
-										var max = d3.max(incomeByCounty_coords, function(d){return parseInt(d.value);});
-										//var max = 0;
-										
-										if(initialise){
-											slice++;
-											for(var t = 0; t < slice * 2 - 1; t++){
-												thresholds[t] = Math.ceil(base * (1 - (gap * (slice - (t + 1)) / 100)));
-											}
-											initialise = false;
-											console.log(thresholds);
-										}
-										
-//										for(var tt = 0; tt < thresholds.length; tt++){
-//											if(thresholds[tt + 1] > c && thresholds[tt] < c){
-//												max = thresholds[tt];
-//											}
-//										}
-										
-										var percentage = c * 100 / max;
-										var p = percentage * 2.55;
-										return "rgb(50, " + Math.ceil(p) + ", 50)";
-									}
+									
 									
 									console.log(incomeByCounty_coords);
 									
@@ -362,7 +406,7 @@ $(function() {
 											.attr("width", xScale.step() - 2)
 											.attr("height", yScale.step() - 2)
 											.attr("fill", function(d){
-												return getColour(d.value, averageDisposableIncome, 2, 10);
+												return getColour(incomeByCounty_coords, d.value, averageDisposableIncome, 2, 10);
 											})
 									
 											.on("mouseover", function(d, i, e){
@@ -397,9 +441,16 @@ $(function() {
 												break;
 										}
 										
-										
-										
 									});
+									
+									
+									
+									
+									
+									
+									
+									
+									
 									
 								});
 							});
