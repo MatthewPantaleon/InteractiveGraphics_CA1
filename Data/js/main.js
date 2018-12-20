@@ -237,7 +237,7 @@ $(function() {
 									//
 									
 									//get object of divisions
-									var garda_division = CR_Q.dataset.dimension["Garda Division"];
+									var garda_division = CR_Q.dataset.dimension["Garda Division"].category.label;
 									
 									//get object of quarters
 									var yearly_quarters = CR_Q.dataset.dimension.Quarter.category.label;
@@ -249,14 +249,20 @@ $(function() {
 									var crime_total = CR_Q.dataset.value;
 									
 									var crimeDivision = {};
-									//crimeDivision.division = getData();
-									crimeDivision.crimeType = getData(crime_type);
 									
+									console.log(crime_type);
+									
+									crimeDivision.crimeType = getData(crime_type, "values");
+									crimeDivision.yearQuarter = getData(yearly_quarters, "values");
+									crimeDivision.regions = getData(garda_division, "values");
+									crimeDivision.values = crime_total;
+									crimeDivision.mapped = masterArray(crime_type, yearly_quarters, garda_division, "values", "values", crime_total);
 									
 									
 									
 									console.log(populationCounties);
 									console.log(incomeByCounty);
+									console.log(crimeDivision);
 									
 									
 									//graphing of the data
@@ -291,8 +297,6 @@ $(function() {
 										.call(d3.axisLeft(yScale));
 									
 									
-									//cells
-									console.log(incomeByCounty);
 									
 									//attribute1, attribute2, valueArray, index
 									var incomeByCounty_coords = heatMap(incomeByCounty.counties, incomeByCounty.years, incomeByCounty.incomeTypes, incomeByCounty.values, 11);
@@ -344,6 +348,7 @@ $(function() {
 									
 									//disposable income by county heatmap
 									thing.append("g")
+											.attr("class", "test")
 											.selectAll()
 											.data(incomeByCounty_coords)
 											.enter()
@@ -365,10 +370,36 @@ $(function() {
 												.attr("x", xScale.step()/2  + margin.left + xScale.step()  * d.col)
 												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
 												.attr("id", d.value + "r" + i);
+												
 											})
 											.on("mouseout", function(d, i){
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
+									
+									
+									$("#selection").on("change", function(e){
+										
+										switch(parseInt($("#selection").val())){
+											case 1:
+												console.log("Income by county");
+												break;
+											case 2:
+												console.log("Something else");
+												break;
+											case 3:
+												console.log("Third thingy");
+												break;
+											case 4:
+												console.log("The final thingy");
+												break;
+											default:
+												console.log("You shouldn't be here");
+												break;
+										}
+										
+										
+										
+									});
 									
 								});
 							});
