@@ -122,9 +122,6 @@ $(function() {
 			}
 			
 		}
-		
-		
-		
 		return truncatedArray;
 	}
 	
@@ -443,12 +440,74 @@ $(function() {
 										
 									});
 									
+									//masterArray(crime_type, yearly_quarters, garda_division, "values", "values", crime_total);
+									var areas = {10: "location_1", 20: "location_2", 30: "location_3"};
+									var badThings = {10: "Kill", 20: "Steal", 30: "Destroy"};
+									var quarters = {
+										"2001Q1": "2001Q1",
+										"2001Q2": "2001Q2",
+										"2001Q3": "2001Q3",
+										"2001Q4": "2001Q4",
+										"2002Q1": "2002Q1",
+										"2002Q2": "2002Q2",
+										"2002Q3": "2002Q3",
+										"2002Q4": "2002Q4",
+										"2003Q1": "2003Q1",
+										"2003Q2": "2003Q2",
+										"2003Q3": "2003Q3",
+										"2003Q4": "2003Q4",
+										"2004Q1": "2004Q1",
+										"2004Q2": "2004Q2",
+										"2004Q3": "2004Q3",
+										"2004Q4": "2004Q4",
+										"2005Q1": "2005Q1",
+										"2005Q2": "2005Q2"
+									};
+									
+									//areas -> badtThings -> quarter
+									var testValues = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //10 -> Kill
+													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //10 -> Steal
+													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //10 -> Destroy
+													  1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //20 -> Kill
+													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //20 -> Steal
+													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //20 -> Destroy
+													  1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //30 -> Kill
+													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //30 -> Steal
+													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //30 -> Destroy
+													 ];
+									
+									var testBand = 4;
+									
+									var testMaster = {};
+									testMaster.areas = getData(areas, "values");
+									testMaster.badThings = getData(badThings, "values");
+									testMaster.quarters = getData(quarters, "values");
+									testMaster.mapped = masterArray(badThings, quarters, areas, "values", "values", testValues);
+									console.log(testMaster);
+									
+									var truncatedTest = [];
+									var testCounter = 0;
+									var temp = 0;
+									for(var t = 0; t < testMaster.mapped.length; t++){
+										
+										for(var tt = 0; tt < testMaster.badThings.length; tt++){
+
+												//truncatedTest.push(testValues[ttt]);
+												for(var tv = 0; tv < testBand; tv++){
+													if(){
+														temp += testValues[(testCounter * testBand) + tv];
+													}
+												}
+												truncatedTest.push(temp);
+												testCounter++;
+												temp = 0;
+
+										}
+									}
 									
 									
-									
-									
-									
-									
+									console.log(truncatedTest);
+									console.log(testMaster.mapped[0]["Kill"]["2001Q1"]);
 									
 									
 									
