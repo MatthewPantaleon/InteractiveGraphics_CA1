@@ -103,9 +103,12 @@ $(function() {
 	}
 	
 	
-	//truncate data to fit another dataset
+	//truncate data to fit another dataset. Used to add yearly quarters into full years
 	/*
-		
+		Master -> Master Array created with ALL values mapped. Array
+		attr1 -> first attribute in mapped array to define value to be selected. String
+		arrt2 -> second attribute in mapped array to define value to be selected. String
+		Band -> group size to be summed. Int
 	*/
 	function truncate(Master, attr1, attr2, Band){
 		var truncatedArray = [];
@@ -149,6 +152,11 @@ $(function() {
 		
 		
 		return truncatedArray;
+	}
+	
+	//average values if two value sets belong to one entity/county
+	function merge(){
+		
 	}
 	
 	
@@ -420,8 +428,19 @@ $(function() {
 									
 									
 									//make a new value array without other regions
-									incomeByCounty.newValues = [];
+									var countiesArray = getData(baseCounties, "values");
+									console.log(countiesArray);
+									console.log(incomeByCounty.counties);
+									incomeByCounty.newCounties = [];
+									var excludeArray = ["State", "Border, Midland and Western", "Border", "Midland", "West", "Southern and Eastern", "Mid-East", "Mid-West", "South-East", "South-West"];
 									
+									for(var ibc = 0; ibc < incomeByCounty.mapped.length; ibc++){
+										if(!excludeArray.includes(incomeByCounty.counties[ibc])){
+											console.log(incomeByCounty.counties[ibc]);
+											incomeByCounty.newCounties.push(incomeByCounty.counties[ibc]);
+										}
+									}
+									console.log(incomeByCounty.newCounties);
 									
 									//attribute1, attribute2, valueArray, index
 									var incomeByCounty_coords = heatMap(incomeByCounty.counties, incomeByCounty.years, incomeByCounty.incomeTypes, incomeByCounty.values, 11);
