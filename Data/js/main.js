@@ -107,21 +107,47 @@ $(function() {
 	/*
 		
 	*/
-	function truncate(attribute1, attribute2, mappped, values, band){
+	function truncate(Master, attr1, attr2, Band){
 		var truncatedArray = [];
-		var num = 0;
-		var counter = 0;
 		
-		for(var i = 0; i < mappped.length; i++){
-			for(var k = 0; k < attribute2.length; k++){
-				for(var j = 0; j < band; j++){
-					num += mappped[i][attribute2[k]][attribute1[j + (k * band)]];
-					
+		var Counter = 0;
+		var temp = 0;
+
+		for(var t = 0; t < Master.mapped.length; t++){
+
+			for(var tt = 0; tt < Master[attr1].length; tt++){
+				//console.log(testMaster.mapped[t][testMaster.badThings[tt]]);
+				Counter = 0;
+
+				for(var q = 0; q < Math.ceil(Master[attr2].length / Band) * Band; q++){
+					for(var tv = 0; tv < Band; tv++){
+
+						if((Counter * Band) + tv < Master[attr2].length){
+							//temp += testValues[(testCounter * testBand) + tv];
+							temp += Master.mapped[t][Master[attr1][tt]][Master[attr2][Counter * Band + tv]];
+							//console.log(temp);
+						}else{
+							break;
+						}
+
+					}
+
+					if(q < Math.ceil(Master[attr2].length / Band)){
+						//console.log(truncatedArray);
+						truncatedArray.push(temp);	
+						temp = 0;
+					}
+					Counter++;
 				}
-			
+
+
+
 			}
-			
+
+
 		}
+		
+		
 		return truncatedArray;
 	}
 	
@@ -319,8 +345,7 @@ $(function() {
 									}
 									console.log(allCrimeArray);
 									
-									var testArray = truncate(crimeDivision.yearQuarter, allCrimeArray, crimeDivision.mapped, crimeDivision.values, 4);
-									console.log(testArray);
+//									var testArray = truncate(crimeDivision.yearQuarter, allCrimeArray, crimeDivision.mapped, crimeDivision.values, 4);
 									
 									var pick = crimeDivision.mapped[0]["Homicide offences"]["2005Q4"];
 									console.log(pick);
@@ -465,15 +490,15 @@ $(function() {
 									};
 									
 									//areas -> badtThings -> quarter
-									var testValues = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //10 -> Kill
-													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //10 -> Steal
-													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //10 -> Destroy
-													  1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //20 -> Kill
-													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //20 -> Steal
-													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //20 -> Destroy
-													  1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //30 -> Kill
-													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //30 -> Steal
-													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //30 -> Destroy
+									var testValues = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //10 -> Kill. 10, 10, 10, 10, 8
+													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //10 -> Steal. 9, 9, 9, 9, 6
+													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //10 -> Destroy. 5, 5, 5, 5, 4
+													  1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //20 -> Kill. 10, 10, 10, 10, 8
+													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //20 -> Steal. 9, 9, 9, 9, 6
+													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //20 -> Destroy. 5, 5, 5, 5, 4
+													  1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //30 -> Kill. 10, 10, 10, 10, 8
+													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //30 -> Steal. 9, 9, 9, 9, 6
+													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //30 -> Destroy. 5, 5, 5, 5, 4
 													 ];
 									
 									var testBand = 4;
@@ -486,50 +511,94 @@ $(function() {
 									console.log(testMaster);
 									
 									var truncatedTest = [];
-									var testCounter = 0;
-									var temp = 0;
-									for(var t = 0; t < testMaster.mapped.length; t++){
-										
-										for(var tt = 0; tt < testMaster.badThings.length; tt++){
-											//console.log(testMaster.mapped[t][testMaster.badThings[tt]]);
-											testCounter = 0;
-											
-											for(var q = 0; q < Math.ceil(testMaster.quarters.length / testBand) * testBand; q++){
-												for(var tv = 0; tv < testBand; tv++){
+									
+//									var testCounter = 0;
+//									var temp = 0;
+//									
+//									for(var t = 0; t < testMaster.mapped.length; t++){
+//										
+//										for(var tt = 0; tt < testMaster.badThings.length; tt++){
+//											//console.log(testMaster.mapped[t][testMaster.badThings[tt]]);
+//											testCounter = 0;
+//											
+//											for(var q = 0; q < Math.ceil(testMaster.quarters.length / testBand) * testBand; q++){
+//												for(var tv = 0; tv < testBand; tv++){
+//													
+//													if((testCounter * testBand) + tv < testMaster.quarters.length){
+//														//temp += testValues[(testCounter * testBand) + tv];
+//														temp += testMaster.mapped[t][testMaster.badThings[tt]][testMaster.quarters[testCounter * testBand + tv]];
+//														console.log(temp);
+//													}else{
+//														break;
+//													}
+//													
+//												}
+//												
+//												if(q < Math.ceil(testMaster.quarters.length / testBand)){
+//													console.log(truncatedTest);
+//													truncatedTest.push(temp);	
+//													temp = 0;
+//												}
+//												testCounter++;
+//											}
+//											
+//											
+//											
+//										}
+//										//testCounter = 0;
+//										
+//										
+//										
+//									}
+									
+									//truncatedTest = truncate(testMaster, "badThings", "quarters", 4);
+									
+									var baseYears ={"2003": "2003",
+													"2004": "2004",
+													"2005": "2005",
+													"2006": "2006",
+													"2007": "2007",
+													"2008": "2008",
+													"2009": "2009",
+													"2010": "2010",
+													"2011": "2011",
+													"2012": "2012",
+													"2013": "2013",
+													"2014": "2014",
+													"2015": "2015",
+													"2016": "2016",
+													"2017": "2017",
+													"2018": "2018",
 													
-													if((testCounter * testBand) + tv < testMaster.quarters.length){
-														//temp += testValues[(testCounter * testBand) + tv];
-														temp += testMaster.mapped[t][testMaster.badThings[tt]][testMaster.quarters[testCounter * testBand + tv]];
-														console.log(temp);
-													}else{
-														break;
-													}
-													
-												}
+													};
+									
+									var truncatedCrimeValues = [];
+									truncatedCrimeValues = truncate(crimeDivision, "crimeType", "yearQuarter", 4);
+									console.log(truncatedCrimeValues);
+									
+									var crimeDivisionYear = {};
+									crimeDivisionYear.regions = getData(garda_division, "values");
+									crimeDivisionYear.years = getData(baseYears, "values");
+									crimeDivisionYear.crimeType = getData(crime_type, "values");
+									crimeDivisionYear.values = truncatedCrimeValues;
+									crimeDivisionYear.mapped = masterArray(crime_type, baseYears, garda_division, "values", "values", truncatedCrimeValues);
+									
+									
+									console.log(crimeDivisionYear);
+									var selectIndex = [33, 37, 42, 43];
+									
+									var crimeDivisionTruncateCrime = {};
+									crimeDivisionTruncateCrime.mapped = [];
+									for(var cdr = 0; cdr < crimeDivisionYear.regions.length; cdr++){
+										for(var cdy = 0; cdy < crimeDivision.crimeType.length; cdy++){
+											if(!selectIndex.includes(cdy)){
+//												console.log(crimeDivisionYear.mapped[cdr][crimeDivisionYear.crimeType[cdy]]);
+												delete crimeDivisionYear.mapped[cdr][crimeDivisionYear.crimeType[cdy]];
 												
-												if(q < Math.ceil(testMaster.quarters.length / testBand)){
-													console.log(truncatedTest);
-													truncatedTest.push(temp);	
-													temp = 0;
-												}
-												testCounter++;
 											}
-											
-											
-											
 										}
-										//testCounter = 0;
-										
-										
-										
 									}
-									
-									
-									
-									console.log(temp);
-									console.log(truncatedTest);
-									console.log(testMaster.mapped[0]["Kill"]["2001Q1"]);
-									
+									console.log(crimeDivisionYear.mapped);
 									
 									
 								});
