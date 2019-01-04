@@ -140,14 +140,10 @@ $(function() {
 						truncatedArray.push(temp);	
 						temp = 0;
 					}
+					
 					Counter++;
 				}
-
-
-
 			}
-
-
 		}
 		
 		
@@ -159,6 +155,21 @@ $(function() {
 		
 	}
 	
+	
+	//trim off unwated data in the master array
+	function trim(Master, ){
+		var newMapped = [];
+		
+		for(var cdr = 0; cdr < crimeDivisionYear.regions.length; cdr++){
+			for(var cdy = 0; cdy < crimeDivision.crimeType.length; cdy++){
+				if(!selectIndex.includes(cdy)){
+					delete crimeDivisionYear.mapped[cdr][crimeDivisionYear.crimeType[cdy]];
+
+				}
+			}
+		}
+		
+	}
 	
 	var initialise = true;
 	var thresholds = [];
