@@ -224,6 +224,37 @@ $(function() {
 									console.log(IC_2015);
 
 									
+									//object of counties
+									var baseCounties = {
+										1: "Carlow",
+										2: "Cavan",
+										3: "Clare",
+										4: "Cork",
+										5: "Donegal",
+										6: "Dublin",
+										7: "Galway",
+										8: "Kerry",
+										9: "Kildare",
+										10: "KilKenny",
+										11: "Laois",
+										12: "Leitrim",
+										13: "Limerick",
+										14: "Longford",
+										15: "Louth",
+										16: "Mayo",
+										17: "Meath",
+										18: "Monaghan",
+										19: "Offaly",
+										20: "Roscommon",
+										21: "Sligo",
+										22: "Tipperary",
+										23: "Waterford",
+										24: "Westmeath",
+										25: "Wexford",
+										26: "Wicklow"
+									};
+									
+									
 									//
 									// Estimates of Household Income by County and Region, Year and Statistic 
 									//
@@ -332,23 +363,20 @@ $(function() {
 									
 									//console.log(testArray);
 									
-									var allCrimeArray = [];
-									for(var qq = 0 ; qq < crimeDivision.crimeIndex.length; qq++){
-
-										if(qq < 16){
-
-											if(crime_type[qq * 100] !== undefined){
-												allCrimeArray.push(crime_type[qq * 100]);
-											}
-
-										}
-									}
-									console.log(allCrimeArray);
+//									var allCrimeArray = [];
+//									for(var qq = 0 ; qq < crimeDivision.crimeIndex.length; qq++){
+//
+//										if(qq < 16){
+//
+//											if(crime_type[qq * 100] !== undefined){
+//												allCrimeArray.push(crime_type[qq * 100]);
+//											}
+//
+//										}
+//									}
+//									console.log(allCrimeArray);
 									
-//									var testArray = truncate(crimeDivision.yearQuarter, allCrimeArray, crimeDivision.mapped, crimeDivision.values, 4);
 									
-									var pick = crimeDivision.mapped[0]["Homicide offences"]["2005Q4"];
-									console.log(pick);
 									
 									//console.log(populationCounties);
 									console.log(incomeByCounty);
@@ -357,7 +385,7 @@ $(function() {
 									
 									//graphing of the data
 									var svgHeight = 1000;
-									var svgWidth = 1000;
+									var svgWidth = 1300;
 									
 									var thing = d3.select("body").append("svg").attr("width", svgWidth).attr("height", svgHeight);
 									
@@ -367,6 +395,8 @@ $(function() {
 									
 									var width = 750 - margin.right - margin.left;
 									var height = 300 - margin.top - margin.bottom;
+									
+									
 									
 									var xScale = d3.scaleBand().range([margin.left, incomeByCounty.counties.length * itemSize]);
 									var yScale = d3.scaleBand().range([0, incomeByCounty.counties.length * itemSize]);
@@ -386,6 +416,11 @@ $(function() {
 										.attr("transform", "translate("+ margin.left + ", " + margin.top +")")
 										.call(d3.axisLeft(yScale));
 									
+									
+									
+									
+									//make a new value array without other regions
+									incomeByCounty.newValues = [];
 									
 									
 									//attribute1, attribute2, valueArray, index
@@ -599,6 +634,12 @@ $(function() {
 										}
 									}
 									console.log(crimeDivisionYear.mapped);
+									
+									var regionExclude = [0, 5, 10, 16, 22 ];
+									
+									for(var cdr2 = 0; cdr2 <  crimeDivisionYear.regions.length; cdr2++){
+//										if(){}
+									}
 									
 									
 								});
