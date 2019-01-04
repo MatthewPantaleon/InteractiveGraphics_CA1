@@ -491,21 +491,42 @@ $(function() {
 									for(var t = 0; t < testMaster.mapped.length; t++){
 										
 										for(var tt = 0; tt < testMaster.badThings.length; tt++){
-
-												//truncatedTest.push(testValues[ttt]);
+											//console.log(testMaster.mapped[t][testMaster.badThings[tt]]);
+											testCounter = 0;
+											
+											for(var q = 0; q < Math.ceil(testMaster.quarters.length / testBand) * testBand; q++){
 												for(var tv = 0; tv < testBand; tv++){
-													if(){
-														temp += testValues[(testCounter * testBand) + tv];
+													
+													if((testCounter * testBand) + tv < testMaster.quarters.length){
+														//temp += testValues[(testCounter * testBand) + tv];
+														temp += testMaster.mapped[t][testMaster.badThings[tt]][testMaster.quarters[testCounter * testBand + tv]];
+														console.log(temp);
+													}else{
+														break;
 													}
+													
 												}
-												truncatedTest.push(temp);
+												
+												if(q < Math.ceil(testMaster.quarters.length / testBand)){
+													console.log(truncatedTest);
+													truncatedTest.push(temp);	
+													temp = 0;
+												}
 												testCounter++;
-												temp = 0;
-
+											}
+											
+											
+											
 										}
+										//testCounter = 0;
+										
+										
+										
 									}
 									
 									
+									
+									console.log(temp);
 									console.log(truncatedTest);
 									console.log(testMaster.mapped[0]["Kill"]["2001Q1"]);
 									
