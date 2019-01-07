@@ -20,11 +20,21 @@
 			font-size: 12px;
 		}
 		.text{
-			fill: lightgray;
+			fill: blue;
 			stroke-width: 0.025%;
-			stroke: black;
+			stroke: red;	
+			
 		}
-		
+		.unify{
+			height: 100%;
+			border: 1px solid black;
+		}
+		#bl{
+			color: blue;
+		}
+		#gr{
+			color: green;
+		}
 		
 	</style>
 <body>
@@ -33,24 +43,29 @@
 		
 		<div class="row income-text justify-content-center">
 			<div class="col-10">
-				<h2>Income</h2>
+				<h2>Income By County (2000 - 2015)</h2>
+				<p>Shows The Total Disposable Income per year.</p>
 			</div>
 			
 		</div>
 		<div class="row burglary-text justify-content-center">
 			<div class="col-10">
-				<h2>Burglary</h2>
+				<h2>Burglary By County (2003 - 2015)</h2>
+				<p>Burglary Crimes committed in each county each year. No Data from 2000 to 2002.</p>
+				
 			</div>
 		</div>
 		<div class="row fraud-text justify-content-center">
 			<div class="col-10">
-				<h2>Fraud</h2>
+				<h2>Fraud By County (2003 - 2015)</h2>
+				<p>Fraud Crimes committed in each county each year. No Data from 2000 to 2002.</p>
 			</div>
 			
 		</div>
 		<div class="row theft-text justify-content-center">
 			<div class="col-10">
-				<h2>Theft</h2>
+				<h2>Theft By County (2003 - 2015)</h2>
+				<p>Theft Crimes committed in each county each year. No Data from 2000 to 2002.</p>
 			</div>
 		</div>
 		
@@ -59,15 +74,24 @@
 			<div class="col-1">
 			</div>
 			
-			<div class="col-3">
-				<select id="selection" class="custom-select">
+			<div class="col-4 align-left">
+				<label for="heatmap">Current Heatmap:</label>
+				<select id="selection" class="custom-select" name="heatmap">
 					<option value="1">Income By County</option>
 					<option value="2">Burglary Rates</option>
 					<option value="3">Fraud Rates</option>
 					<option value="4">Theft Rates</option>
 				</select>
+				<label class="income-text">Income Average: <span class="income-average">1</span></label>
+				<label class="burglary-text">Burglary Average: <span class="burglary-average">2</span></label>
+				<label class="fraud-text">Fraud Average: <span class="fraud-average">3</span></label>
+				<label class="theft-text">Theft Average: <span class="theft-average">4</span></label>
+
+				<label><span id="bl">Blue</span> is less than Average.</label>
+				<label><span id="gr">Green</span> is more than Average.</label>
 			</div>
 		</div>
+		
 		<!-- Append SVG here -->
 		<div class="row">
 			<div class="col-10 svgHere justify-content-center">

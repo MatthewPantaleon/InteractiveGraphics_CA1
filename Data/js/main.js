@@ -1,4 +1,4 @@
-$(function() {
+$(function() {//ready function
 	"use strict";
 	
 	console.log("Script Started");
@@ -203,6 +203,12 @@ $(function() {
 	}
 	
 	//reevaluate values array for use in heatmap. Uses new Trimmed mapped array
+	/*
+		Master -> master OBJECT to re-extract values. Object
+		attrArray1 -> first array of values used to define values. Array
+		attrArray2 -> second array of values used to define values. Array
+	
+	*/
 	function evaluate(Master, attrArray1, attrArray2){
 		var newValues = [];
 		for(var m = 0; m < Master.mapped.length; m++){
@@ -226,13 +232,26 @@ $(function() {
 		return newValues;
 	}
 	
-	var initialise = true;
-	var thresholds = [];
 	
-	function getColour(coords, c, base, slice, gap){
+	//Colour function to colour rects
+	var initialise = true;//originally used to evaluate breakpoints once
+	var thresholds = [];//array to store breakpoints. Deprecated
+	
+	/*
+		coords -> heatmap array containing row, column and values. Array
+		c -> current value in d3 loop. d.value
+		base -> average value to be tested against. Int
+		slice -> how many break points before and after the average value. Int. Not Used
+		gap -> percentage gap between each breakpoint. Int. Not Used
+		boost -> boost colour contrast. Int, nullable
+	*/
+	function getColour(coords, c, base, slice, gap, boost){
 		var max = d3.max(coords, function(d){return parseInt(d.value);});
 		//var max = 0;
 
+		if(boost == undefined){
+		   boost = 1;
+		}
 		if(initialise){
 			slice++;
 			for(var t = 0; t < slice * 2 - 1; t++){
@@ -242,38 +261,55 @@ $(function() {
 			console.log(thresholds);
 		}
 
-//										for(var tt = 0; tt < thresholds.length; tt++){
-//											if(thresholds[tt + 1] > c && thresholds[tt] < c){
-//												max = thresholds[tt];
-//											}
-//										}
-
+//		for(var tt = 0; tt < thresholds.length; tt++){
+//			if(thresholds[tt + 1] > c && thresholds[tt] < c){
+//				max = thresholds[tt];
+//			}
+//		}
+		
 		var percentage = c * 100 / max;
-		var p = percentage * 2.55;
-		return "rgb(0, " + Math.ceil(p) + ", 0)";
+		var p = percentage * 2.55 * boost;
+		
+		if(c > base){
+			return "rgb(0, " + Math.ceil(p) + ", 0)";
+		}else if(c < base){
+			return "rgb(0, 0, "+ Math.ceil(p) + ")";
+		}
+		
+		
 	}
 	
+	//load in JSON files
+	
+	//"Population Aged 15 Years and Over 2016   by  Sex, Highest Level of Education Completed, Towns by Size and CensusYear". Not Used
 	d3.json("data/education_town_2016.json", function(error, education_town_2016){
 		if(error !== null){console.log("Unable to laod education_town_2016 JSON file");}
 		
+		//"Recorded Crime Offences Under Reservation by  Garda Division, Type of Offence and Quarter"
 		d3.json("data/crime_by_region_Q.json", function(error, crime_by_region_Q){
 			if(error !== null){console.log("Unable to laod crime_by_region_Q JSON file");}
 			
+			//"Population at Each Census 1841 to 2016 by  County, Sex and CensusYear". Not Used
 			d3.json("data/population_county.json", function(error, population_county){
 				if(error !== null){console.log("Unable to laod population_county JSON file");}
 				
+				//"Income and Poverty Rates by Region, Year and Statistic". Not Used
 				d3.json("data/income_region.json", function(error, income_region){
 					if(error !== null){console.log("Unable to laod income_region JSON file");}
 					
+					//"Income and Poverty Rates by Highest Level of Education Completed, Year and Statistic". Not Used
 					d3.json("data/income_by_education.json", function(error, income_by_education){
 						if(error !== null){console.log("Unable to laod income_by_education JSON file");}
 						
+						//"Population Aged 15 Years and Over by  Sex, Highest Level of Education Completed, Towns by Size and CensusYear". Not Used
 						d3.json("data/education_town_2011.json", function(error, education_town_2011){
 							if(error !== null){console.log("Unable to laod income_by_education JSON file");}
 							
+							//"Population Aged 15 Years and Over 2011 to 2016 by  Age at which Full, Sex, Highest Level of Education Completed, County and City and CensusYear". Not Used
 							d3.json("data/education_county_city_2016_2011.json", function(error, education_county_city_2016_2011){
 							if(error !== null){console.log("Unable to laod income_by_education JSON file");}
 								
+								//"Estimates of Household Income by County and Region, Year and Statistic"
 								d3.json("data/income_county_2015.json", function(error, income_county_2015){
 									if(error !== null){console.log("Unable to laod income_by_education JSON file");}
 								
@@ -298,7 +334,7 @@ $(function() {
 									console.log(IC_2015);
 
 									
-									//object of counties
+									//object of counties. Alphabetically Arranged. Needed because each dataset has it's own set of regions
 									var baseCounties = {
 										1: "Carlow",
 										2: "Cavan",
@@ -354,7 +390,7 @@ $(function() {
 									incomeByCounty.values = income_values_raw;
 									
 									//
-									// Income and Poverty Rates by Region, Year and Statistic
+									// Income and Poverty Rates by Region, Year and Statistic. Not used
 									//
 									
 									//get object of regions
@@ -380,30 +416,32 @@ $(function() {
 									
 									
 									//
-									// Population at Each Census 1841 to 2016 by County, Sex and CensusYear
+									// Population at Each Census 1841 to 2016 by County, Sex and CensusYear. Not Used
 									//
 									
 									//get object of counties
-									var population_by_county = PC.dataset.dimension.County.category.label;
+//									var population_by_county = PC.dataset.dimension.County.category.label;
+//									
+//									//get object of years
+//									var population_by_year = PC.dataset.dimension["Census Year"].category.label;
+//									
+//									//get population_by_sex
+//									var population_by_sex = PC.dataset.dimension.Sex.category.label;
+//									
+//									//get populsation values
+//									var population_total = PC.dataset.value;
+//									
+//									var populationCounties = {};
+//									populationCounties.counties = getData(population_by_county, "values");
+//									populationCounties.sex = getData(population_by_sex, "values");
+//									populationCounties.years = getData(population_by_year, "values");
+//									populationCounties.mapped = masterArray(population_by_sex, population_by_year, population_by_county, "values", "values", population_total);
+//									populationCounties.values = population_total;
+//									
+//									console.log(populationCounties.mapped);
+//									console.log(populationCounties.counties);
 									
-									//get object of years
-									var population_by_year = PC.dataset.dimension["Census Year"].category.label;
 									
-									//get population_by_sex
-									var population_by_sex = PC.dataset.dimension.Sex.category.label;
-									
-									//get populsation values
-									var population_total = PC.dataset.value;
-									
-									var populationCounties = {};
-									populationCounties.counties = getData(population_by_county, "values");
-									populationCounties.sex = getData(population_by_sex, "values");
-									populationCounties.years = getData(population_by_year, "values");
-									populationCounties.mapped = masterArray(population_by_sex, population_by_year, population_by_county, "values", "values", population_total);
-									populationCounties.values = population_total;
-									
-									console.log(populationCounties.mapped);
-									console.log(populationCounties.counties);
 									
 									//
 									// Get crime rates by division and quarter
@@ -425,6 +463,7 @@ $(function() {
 									
 									var crimeDivision = {};
 									
+									//bundle attribute arrays in a master object
 									crimeDivision.regions = getData(garda_division, "values");
 									crimeDivision.crimeType = getData(crime_type, "values");
 									crimeDivision.crimeIndex = getData(crime_type, "keys");
@@ -432,33 +471,16 @@ $(function() {
 									crimeDivision.mapped = masterArray(crime_type, yearly_quarters, garda_division, "values", "values", crime_total);
 									crimeDivision.values = crime_total;
 									
-									
-									//trancate quarterly to anually, garda division to county
-									var truncateCrime = {};
-									
-									//console.log(testArray);
-									
-//									var allCrimeArray = [];
-//									for(var qq = 0 ; qq < crimeDivision.crimeIndex.length; qq++){
-//
-//										if(qq < 16){
-//
-//											if(crime_type[qq * 100] !== undefined){
-//												allCrimeArray.push(crime_type[qq * 100]);
-//											}
-//
-//										}
-//									}
-//									console.log(allCrimeArray);
-									
-									
-									
-									//console.log(populationCounties);
+									//Check Masters
 									console.log(incomeByCounty);
 									console.log(crimeDivision);
 									
+//-------------------------------------------------------------------------------------------------------------------------------------
+									
 									
 									//graphing of the data
+									
+									//create SVG element
 									var svgHeight = 1000;
 									var svgWidth = 1000;
 									
@@ -471,7 +493,7 @@ $(function() {
 									var width = 750 - margin.right - margin.left;
 									var height = 300 - margin.top - margin.bottom;
 									
-									
+									//rearrange counties of Income Dataset to be alphabetical
 //									31: "Carlow", 
 //									7: "Cavan", 
 //									28: "Clare",
@@ -501,26 +523,32 @@ $(function() {
 									
 									var completeIncomeByCounty = {};
 									var selectCounties = [31, 7, 28, 1, 8, 22, 2, 36, 24, 32, 14, 9, 3, 15, 10, 19, 25, 11, 16, 20, 12, 33, 4, 17, 34, 26];
+									
+									//map new master array
 									completeIncomeByCounty.mapped = trim(incomeByCounty, selectCounties, "counties");
 									
 									console.log(completeIncomeByCounty);
+									
+									//re-evaluate values array
 									completeIncomeByCounty.values = evaluate(completeIncomeByCounty, incomeByCounty.years, incomeByCounty.incomeTypes);
 									
 									console.log(completeIncomeByCounty.values);
 									
+									//set axis ranges
 									var xScale = d3.scaleBand().range([margin.left, incomeByCounty.counties.length * itemSize]);
 									var yScale = d3.scaleBand().range([0, incomeByCounty.counties.length * itemSize]);
 									
+									//set domains of axis
 									xScale.domain(incomeByCounty.years);
 									yScale.domain(getData(baseCounties, "values"));
 									
-									//graph incometypes axis
+									//graph years axis
 									thing.append("g")
 										.attr("class", "axis")
 										.attr("transform", "translate("+ 0 + ", " + margin.top +")")
 										.call(d3.axisTop(xScale));
 									
-									//graph incometypes
+									//graph counties axis
 									thing.append("g")
 										.attr("class", "axis")
 										.attr("transform", "translate("+ margin.left + ", " + margin.top +")")
@@ -534,7 +562,9 @@ $(function() {
 									console.log(countiesArray);
 									console.log(incomeByCounty.counties);
 									incomeByCounty.newCounties = [];
-									var excludeArray = ["State", "Border, Midland and Western", "Border", "Midland", "West", "Southern and Eastern", "Mid-East", "Mid-West", "South-East", "South-West"];
+									
+									//testing code
+//									var excludeArray = ["State", "Border, Midland and Western", "Border", "Midland", "West", "Southern and Eastern", "Mid-East", "Mid-West", "South-East", "South-West"];
 									
 //									for(var ibc = 0; ibc < incomeByCounty.mapped.length; ibc++){
 //										if(!excludeArray.includes(incomeByCounty.counties[ibc])){
@@ -546,10 +576,14 @@ $(function() {
 									
 									//attribute1, attribute2, valueArray, index
 //									var incomeByCounty_coords = heatMap(incomeByCounty.counties, incomeByCounty.years, incomeByCounty.incomeTypes, incomeByCounty.values, 11);
+									
+									//get coordinates for heatmap mapping
 									var incomeByCounty_coords = heatMap(countiesArray, incomeByCounty.years, incomeByCounty.incomeTypes, completeIncomeByCounty.values, 11, true);
 									
 									//var incomeMedianRegion_coords = heatMap(incomeMedianByRegion.regions, incomeMedianByRegion.years, incomeMedianByRegion.medians, incomeMedianByRegion.values, 0);
 									
+									
+									//get average income
 									var averageDisposableIncome = 0;
 									var totalDisposableIncome = 0;
 									
@@ -561,14 +595,11 @@ $(function() {
 									console.log(Math.ceil(totalDisposableIncome / incomeByCounty_coords.length));
 									
 									averageDisposableIncome = Math.ceil(totalDisposableIncome / incomeByCounty_coords.length);
-									
-									
-									
-									
-									
+
+									//check coordinates
 									console.log(incomeByCounty_coords);
 									
-									var transitionStart = 0;
+									
 									//disposable income by county heatmap
 									thing.append("g")
 											.attr("class", "income")
@@ -594,6 +625,9 @@ $(function() {
 												return getColour(incomeByCounty_coords, d.value, averageDisposableIncome, 2, 10);
 											})
 											.attr("id", function(d, i){return  d.value + "r" + d.col + "c" + d.row;})
+									
+											//transition effect breaks d3 on(). So a seperate mouseover is made
+									
 //											.on("mouseover", function(d, i, e){
 //												thing.append("text").text(d.value)
 //												.attr("x", xScale.step()/3  + margin.left + xScale.step()  * d.col)
@@ -606,7 +640,7 @@ $(function() {
 //												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 //											});
 									
-											//on hover for first heatmap
+											//mouseover for first heatmap
 											$(".income rect").on("mouseover", function(e){
 												var id = this.id.split("r")[0];
 												var row = this.id.substring(this.id.lastIndexOf("r") + 1, this.id.lastIndexOf("c"));
@@ -627,8 +661,15 @@ $(function() {
 											});
 									
 									
-									console.log(crimeDivision.regions);
+									//put average value of income on page
+									$(".income-average").html("€" + averageDisposableIncome);
 									
+//-------------------------------------------------------------------------------------------------------------------------------------
+									
+									//page UI
+									
+									
+									//initially hide all crime heatmaps
 									$(".theft-text").hide();
 									$(".fraud-text").hide();
 									$(".burglary-text").hide();
@@ -650,7 +691,7 @@ $(function() {
 												$(".income-text").show();
 												break;
 											case 2:
-//												console.log("Something else");
+//												console.log("Burglaries by county");
 												$(".theft").fadeOut();
 												$(".fraud").fadeOut();
 												$(".income").fadeOut();
@@ -662,7 +703,7 @@ $(function() {
 												$(".burglary-text").show();
 												break;
 											case 3:
-//												console.log("Third thingy");
+//												console.log("Fraud by county");
 												$(".theft").fadeOut();
 												$(".burglary").fadeOut();
 												$(".income").fadeOut();
@@ -675,7 +716,7 @@ $(function() {
 												
 												break;
 											case 4:
-//												console.log("The final thingy");
+//												console.log("Theft by county");
 												$(".burglary").fadeOut();
 												$(".income").fadeOut();
 												$(".fraud").fadeOut();
@@ -692,13 +733,22 @@ $(function() {
 										}
 										
 									});
+									
+									
+//-------------------------------------------------------------------------------------------------------------------------------------
+									
+									
 									//
-									//testing objects to test truncate function, to add up quarters to form years
+									//testing values to test truncate function, to add up quarters to form years
 									//
 									
-									//masterArray(crime_type, yearly_quarters, garda_division, "values", "values", crime_total);
+									//test regions
 									var areas = {10: "location_1", 20: "location_2", 30: "location_3"};
+									
+									//test crime types
 									var badThings = {10: "Kill", 20: "Steal", 30: "Destroy"};
+									
+									//test quarters
 									var quarters = {
 										"2001Q1": "2001Q1",
 										"2001Q2": "2001Q2",
@@ -721,6 +771,7 @@ $(function() {
 									};
 									
 									//areas -> badtThings -> quarter
+									//final results of the truncate function as commented beside each of the values
 									var testValues = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //10 -> Kill. 10, 10, 10, 10, 8
 													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //10 -> Steal. 9, 9, 9, 9, 6
 													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //10 -> Destroy. 5, 5, 5, 5, 4
@@ -732,8 +783,10 @@ $(function() {
 													  1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 1, 1, 0, 3, 2, 2, //30 -> Destroy. 5, 5, 5, 5, 4
 													 ];
 									
+									//test grouping
 									var testBand = 4;
 									
+									//test Master Object
 									var testMaster = {};
 									testMaster.areas = getData(areas, "values");
 									testMaster.badThings = getData(badThings, "values");
@@ -741,8 +794,10 @@ $(function() {
 									testMaster.mapped = masterArray(badThings, quarters, areas, "values", "values", testValues);
 									console.log(testMaster);
 									
-									var truncatedTest = [];
+//-------------------------------------------------------------------------------------------------------------------------------------
 									
+									
+									//years to be used in maping the crime heatmaps
 									var baseYears ={"2003": "2003",
 													"2004": "2004",
 													"2005": "2005",
@@ -762,10 +817,15 @@ $(function() {
 													
 													};
 									
+									//get truncated values of all crimes
 									var truncatedCrimeValues = [];
 									truncatedCrimeValues = truncate(crimeDivision, "crimeType", "yearQuarter", 4);
 									console.log(truncatedCrimeValues);
 									
+									
+									console.log(crimeDivision.regions);
+									
+									//create new master with truncated values and years
 									var crimeDivisionYear = {};
 									crimeDivisionYear.regions = getData(garda_division, "values");
 									crimeDivisionYear.years = getData(baseYears, "values");
@@ -775,6 +835,8 @@ $(function() {
 									
 									
 									console.log(crimeDivisionYear);
+									
+									//particularly select these crime types from the original crimeType array
 									var selectIndex = [33, 37, 42, 43];
 									
 									var crimeDivisionTruncateCrime = {};
@@ -866,8 +928,11 @@ $(function() {
 									
 									
 									console.log(totalBurglaries);
-									averageBurglaries = Math.floor(totalBurglaries / (incomeByCounty.years.length * countiesArray.length));
+									averageBurglaries = Math.floor(totalBurglaries / ((incomeByCounty.years.length - 6) * countiesArray.length));
 									console.log(averageBurglaries);
+									
+									//put average burglaries to page
+									$(".burglary-average").html(averageBurglaries + " Instances");
 									
 									var burglary_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[0], completeCrimeByDivision.mapped, 0, false);
 									console.log(burglary_coords);
@@ -889,7 +954,7 @@ $(function() {
 											.attr("width", xScale.step() - 2)
 											.attr("height", yScale.step() - 2)
 											.attr("fill", function(d){
-												return getColour(burglary_coords, d.value, averageBurglaries, 2, 10);
+												return getColour(burglary_coords, d.value, averageBurglaries, 2, 10, 5);
 											})
 									
 											.on("mouseover", function(d, i, e){
@@ -920,8 +985,11 @@ $(function() {
 									
 									}
 									console.log(totalFraud);
-									averageFraud = Math.floor(totalFraud / (incomeByCounty.years.length * countiesArray.length));
+									averageFraud = Math.floor(totalFraud / ((incomeByCounty.years.length - 6) * countiesArray.length));
 									console.log(averageFraud);
+									
+									//put average fraud to page
+									$(".fraud-average").html(averageFraud + " Instances");
 									
 									thing.append("g")
 											.attr("class", "fraud")
@@ -939,7 +1007,7 @@ $(function() {
 											.attr("width", xScale.step() - 2)
 											.attr("height", yScale.step() - 2)
 											.attr("fill", function(d){
-												return getColour(fraud_coords, d.value, averageFraud, 2, 10);
+												return getColour(fraud_coords, d.value, averageFraud, 2, 10, 5);
 											})
 									
 											.on("mouseover", function(d, i, e){
@@ -976,9 +1044,12 @@ $(function() {
 									
 									}
 									console.log(totalTheft);
-									averageTheft = Math.floor(totalTheft / (incomeByCounty.years.length * countiesArray.length));
+									averageTheft = Math.floor(totalTheft / ((incomeByCounty.years.length - 6) * countiesArray.length));
 									console.log(averageTheft);
 									
+									
+									//put average theft to page
+									$(".theft-average").html(averageTheft + " Instances");
 									
 									thing.append("g")
 											.attr("class", "theft")
@@ -996,7 +1067,7 @@ $(function() {
 											.attr("width", xScale.step() - 2)
 											.attr("height", yScale.step() - 2)
 											.attr("fill", function(d){
-												return getColour(theft_coords, d.value, averageTheft, 2, 10);
+												return getColour(theft_coords, d.value, averageTheft, 2, 10, 5);
 											})
 									
 											.on("mouseover", function(d, i, e){
