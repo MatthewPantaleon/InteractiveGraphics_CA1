@@ -613,7 +613,7 @@ $(function() {//ready function
 											.attr("x", margin.left)//starting x of each rectangle
 											.attr("y", margin.top)//starting y of each rectangle
 											.transition()
-											.delay(function(d, i){return 8 * i;})//transition delay for each rectangle
+											.delay(function(d, i){return 5 * i;})//transition delay for each rectangle
 											.style("opacity", 1)
 											.attr("x", function(d){
 												return 3 + margin.left + xScale.step() * d.col;
