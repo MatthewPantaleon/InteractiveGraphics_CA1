@@ -249,7 +249,7 @@ $(function() {//ready function
 		var max = d3.max(coords, function(d){return parseInt(d.value);});
 		//var max = 0;
 
-		if(boost == undefined){
+		if(boost == undefined || boost == 0){
 		   boost = 1;
 		}
 		if(initialise){
@@ -274,6 +274,8 @@ $(function() {//ready function
 			return "rgb(0, " + Math.ceil(p) + ", 0)";
 		}else if(c < base){
 			return "rgb(0, 0, "+ Math.ceil(p) + ")";
+		}else if(c == base){
+			return "rgb(0, "+Math.ceil(p)+", "+ Math.ceil(p) + ")";
 		}
 		
 		
@@ -608,10 +610,10 @@ $(function() {//ready function
 											.enter()
 											.append("rect")
 											.style("opacity", 0)
-											.attr("x", margin.left)
-											.attr("y", margin.top)
+											.attr("x", margin.left)//starting x of each rectangle
+											.attr("y", margin.top)//starting y of each rectangle
 											.transition()
-											.delay(function(d, i){return 3 * i;})
+											.delay(function(d, i){return 8 * i;})//transition delay for each rectangle
 											.style("opacity", 1)
 											.attr("x", function(d){
 												return 3 + margin.left + xScale.step() * d.col;
@@ -639,6 +641,7 @@ $(function() {//ready function
 //											.on("mouseout", function(d, i){
 //												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 //											});
+									
 									
 											//mouseover for first heatmap
 											$(".income rect").on("mouseover", function(e){
@@ -770,7 +773,7 @@ $(function() {//ready function
 										"2005Q2": "2005Q2"
 									};
 									
-									//areas -> badtThings -> quarter
+									//areas -> badtThings -> quarter. Defines each value in the testValues array
 									//final results of the truncate function as commented beside each of the values
 									var testValues = [1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 4, 4, //10 -> Kill. 10, 10, 10, 10, 8
 													  2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 2, 3, 2, 2, 3, 3, //10 -> Steal. 9, 9, 9, 9, 6
@@ -796,6 +799,8 @@ $(function() {//ready function
 									
 //-------------------------------------------------------------------------------------------------------------------------------------
 									
+									//contrast multiplier
+									var boostMultiplier = 10;
 									
 									//years to be used in maping the crime heatmaps
 									var baseYears ={"2003": "2003",
@@ -877,6 +882,7 @@ $(function() {//ready function
 //									24: "Wexford",
 //									26: "Wicklow"
 									
+									//alphabetically selecting each region
 									var crimeRegionSelect = [25, 1, 6, 11, 2, 27, 8, 14, 21, 25, 9, 3, 15, 9, 4, 7, 18, 1, 17, 9, 3, 23, 26, 20, 24, 26];
 									var completeCrimeByDivision = {};
 									
@@ -909,6 +915,9 @@ $(function() {//ready function
 									}
 									
 									
+									//get average burglaries
+									var averageBurglaries = 0;
+									var totalBurglaries = 0;
 									
 									console.log(completeCrimeByDivision);
 									var burglaryValues = evaluate(completeCrimeByDivision, crimeNames, incomeByCounty.years);
@@ -922,22 +931,21 @@ $(function() {//ready function
 									
 									}
 									
-									//get average burglaries
-									var averageBurglaries = 0;
-									var totalBurglaries = 0;
+									
 									
 									console.log(totalBurglaries);
-									averageBurglaries = Math.floor(totalBurglaries / ((incomeByCounty.years.length - 6) * countiesArray.length));
+									averageBurglaries = Math.floor(totalBurglaries / ((incomeByCounty.years.length - 3) * countiesArray.length));
 									console.log(averageBurglaries);
 									
 									//put average burglaries to page
 									$(".burglary-average").html(averageBurglaries + " Instances");
 									
+									//get heatmap coordinates for burglary
 									var burglary_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[0], completeCrimeByDivision.mapped, 0, false);
 									console.log(burglary_coords);
 									
 									
-									//graph
+									//graph burglary heatmap
 									thing.append("g")
 											.attr("class", "burglary")
 											.selectAll()
@@ -954,7 +962,7 @@ $(function() {//ready function
 											.attr("width", xScale.step() - 2)
 											.attr("height", yScale.step() - 2)
 											.attr("fill", function(d){
-												return getColour(burglary_coords, d.value, averageBurglaries, 2, 10, 5);
+												return getColour(burglary_coords, d.value, averageBurglaries, 2, 10, boostMultiplier);
 											})
 									
 											.on("mouseover", function(d, i, e){
@@ -968,8 +976,13 @@ $(function() {//ready function
 											.on("mouseout", function(d, i){
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
-									$(".burglary").hide();
+									$(".burglary").hide();//hide heatmap until it's selected
 									
+									
+//-------------------------------------------------------------------------------------------------------------------------------------
+									
+									
+									//graph fruad rates
 									var fraud_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[1], completeCrimeByDivision.mapped, 0, false);
 									
 									var averageFraud = 0;
@@ -985,12 +998,15 @@ $(function() {//ready function
 									
 									}
 									console.log(totalFraud);
-									averageFraud = Math.floor(totalFraud / ((incomeByCounty.years.length - 6) * countiesArray.length));
+									averageFraud = Math.floor(totalFraud / ((incomeByCounty.years.length - 3) * countiesArray.length));
 									console.log(averageFraud);
+									
 									
 									//put average fraud to page
 									$(".fraud-average").html(averageFraud + " Instances");
 									
+									
+									//graph heatmap of fraud rates
 									thing.append("g")
 											.attr("class", "fraud")
 											.selectAll()
@@ -1007,7 +1023,7 @@ $(function() {//ready function
 											.attr("width", xScale.step() - 2)
 											.attr("height", yScale.step() - 2)
 											.attr("fill", function(d){
-												return getColour(fraud_coords, d.value, averageFraud, 2, 10, 5);
+												return getColour(fraud_coords, d.value, averageFraud, 2, 10, boostMultiplier);
 											})
 									
 											.on("mouseover", function(d, i, e){
@@ -1021,15 +1037,11 @@ $(function() {//ready function
 											.on("mouseout", function(d, i){
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
-									$(".fraud").hide();
-//									incomeByCounty.counties = getData(county_raw, "values");
-//									incomeByCounty.incomeTypes = getData(income_types_raw, "values");
-//									incomeByCounty.years = getData(years_raw, "values");
-//									incomeByCounty.mapped = masterArray(years_raw, income_types_raw, county_raw, "keys", "values", income_values_raw);
-//									incomeByCounty.values = income_values_raw;
-									var testingArray = [0, 1, 2];
-									var testComplete = [];
-									testComplete = trim(incomeByCounty, testingArray, "counties");
+									$(".fraud").hide();//hide fraud heatmap until it's selected
+									
+//-------------------------------------------------------------------------------------------------------------------------------------
+									
+									//graph theft rates
 									
 									var theft_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[2], completeCrimeByDivision.mapped, 0, false);
 									console.log(theft_coords);
@@ -1044,14 +1056,17 @@ $(function() {//ready function
 										}
 									
 									}
+									
+									
 									console.log(totalTheft);
-									averageTheft = Math.floor(totalTheft / ((incomeByCounty.years.length - 6) * countiesArray.length));
+									averageTheft = Math.floor(totalTheft / ((incomeByCounty.years.length - 3) * countiesArray.length));
 									console.log(averageTheft);
 									
 									
 									//put average theft to page
 									$(".theft-average").html(averageTheft + " Instances");
 									
+									//graph theft rates
 									thing.append("g")
 											.attr("class", "theft")
 											.selectAll()
@@ -1068,7 +1083,7 @@ $(function() {//ready function
 											.attr("width", xScale.step() - 2)
 											.attr("height", yScale.step() - 2)
 											.attr("fill", function(d){
-												return getColour(theft_coords, d.value, averageTheft, 2, 10, 5);
+												return getColour(theft_coords, d.value, averageTheft, 2, 10, boostMultiplier);
 											})
 									
 											.on("mouseover", function(d, i, e){
@@ -1082,7 +1097,8 @@ $(function() {//ready function
 											.on("mouseout", function(d, i){
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
-									$(".theft").hide();
+									
+									$(".theft").hide();//hide theft heatmap until it's selected
 									
 									
 									
@@ -1096,4 +1112,5 @@ $(function() {//ready function
 	});
 	
 	
-});
+	
+});//END ready function
