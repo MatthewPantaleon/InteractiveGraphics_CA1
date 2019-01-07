@@ -886,15 +886,8 @@ $(function() {//ready function
 									console.log(completeCrimeByDivision.mapped);
 									
 									
-									//heatMap(attribute1, attribute2, attribute3, valueArray, index)
-									//countiesArray, incomeByCounty.years
 									
-									
-									var averageBurglaries = 0;
-									var totalBurglaries = 0;
-									
-									
-									
+
 									//remove excess years
 									var removeYears = ["2016", "2017", "2018"];
 									for(var y = 0; y < completeCrimeByDivision.mapped.length; y++){
@@ -915,6 +908,8 @@ $(function() {//ready function
 										}
 									}
 									
+									
+									
 									console.log(completeCrimeByDivision);
 									var burglaryValues = evaluate(completeCrimeByDivision, crimeNames, incomeByCounty.years);
 									console.log(burglaryValues);
@@ -927,6 +922,9 @@ $(function() {//ready function
 									
 									}
 									
+									//get average burglaries
+									var averageBurglaries = 0;
+									var totalBurglaries = 0;
 									
 									console.log(totalBurglaries);
 									averageBurglaries = Math.floor(totalBurglaries / ((incomeByCounty.years.length - 6) * countiesArray.length));
@@ -939,6 +937,7 @@ $(function() {//ready function
 									console.log(burglary_coords);
 									
 									
+									//graph
 									thing.append("g")
 											.attr("class", "burglary")
 											.selectAll()
