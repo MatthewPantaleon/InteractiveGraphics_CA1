@@ -17,20 +17,37 @@
 	<style>
 		
 		svg text{
-			font-size: 10px;
+			font-size: 12px;
 		}
+		.text{
+			fill: lightgray;
+			stroke-width: 0.025%;
+			stroke: black;
+		}
+		
 		
 	</style>
 <body>
-      
-	<select id="selection">
-		<option value="1">Volvo</option>
-		<option value="2">Saab</option>
-		<option value="3">Mercedes</option>
-		<option value="4">Audi</option>
-	</select>
+    <div class="container">
+		<div class="row justify-content-center">
+			
+			<div class="col">
+				<select id="selection">
+					<option value="1">Income By County</option>
+					<option value="2">Burglary Rates</option>
+					<option value="3">Fraud Rates</option>
+					<option value="4">Theft Rates</option>
+				</select>
+			</div>
+		</div>
 	
+		<div class="row">
+			<div class="col svgHere">
+				
+			</div>
+		</div>
 	
+	</div>
       
 	<script src="js/main.js"></script>
 </body>

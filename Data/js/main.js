@@ -65,12 +65,13 @@ $(function() {
 			for(var d = 0; d < attribute1.length; d++){
 
 				for(var dd = 0; dd < attribute2.length; dd++){
+//					console.log(valueArray[d][attribute3]);
 					
 					coords.push({
 						row: d, 
 						col: dd, 
-						value: valueArray[increment],
-						valueName: attribute3[index]
+						value: valueArray[d][attribute3][attribute2[dd]],
+//						valueName: attribute3[index]
 					});
 					//console.log(coords[d * dd].value);
 					increment++;
@@ -382,26 +383,27 @@ $(function() {
 									// Population at Each Census 1841 to 2016 by County, Sex and CensusYear
 									//
 									
-//									//get object of counties
-//									var population_by_county = PC.dataset.dimension.County.category.label;
-//									
-//									//get object of years
-//									var population_by_year = PC.dataset.dimension["Census Year"].category.label;
-//									
-//									//get population_by_sex
-//									var population_by_sex = PC.dataset.dimension.Sex.category.label;
-//									
-//									//get populsation values
-//									var population_total = PC.dataset.value;
-//									
-//									var populationCounties = {};
-//									populationCounties.counties = getData(population_by_county, "values");
-//									populationCounties.sex = getData(population_by_sex, "values");
-//									populationCounties.years = getData(population_by_year, "values");
-//									populationCounties.mapped = masterArray(population_by_sex, population_by_year, population_by_county, "values", "values", population_total);
-//									populationCounties.values = population_total;
+									//get object of counties
+									var population_by_county = PC.dataset.dimension.County.category.label;
 									
+									//get object of years
+									var population_by_year = PC.dataset.dimension["Census Year"].category.label;
 									
+									//get population_by_sex
+									var population_by_sex = PC.dataset.dimension.Sex.category.label;
+									
+									//get populsation values
+									var population_total = PC.dataset.value;
+									
+									var populationCounties = {};
+									populationCounties.counties = getData(population_by_county, "values");
+									populationCounties.sex = getData(population_by_sex, "values");
+									populationCounties.years = getData(population_by_year, "values");
+									populationCounties.mapped = masterArray(population_by_sex, population_by_year, population_by_county, "values", "values", population_total);
+									populationCounties.values = population_total;
+									
+									console.log(populationCounties.mapped);
+									console.log(populationCounties.counties);
 									
 									//
 									// Get crime rates by division and quarter
@@ -458,9 +460,9 @@ $(function() {
 									
 									//graphing of the data
 									var svgHeight = 1000;
-									var svgWidth = 1300;
+									var svgWidth = 1000;
 									
-									var thing = d3.select("body").append("svg").attr("width", svgWidth).attr("height", svgHeight);
+									var thing = d3.select(".svgHere").append("svg").attr("width", svgWidth).attr("height", svgHeight).attr("class", "mainSVG");
 									
 									var itemSize = 25;
 									var cellSize = itemSize - 1;
@@ -574,6 +576,9 @@ $(function() {
 											.data(incomeByCounty_coords)
 											.enter()
 											.append("rect")
+											.transition()
+											
+											.delay(function(d, i){ return 10 * i;})
 											.attr("x", function(d){
 												return 3 + margin.left + xScale.step() * d.col;
 											})
@@ -588,16 +593,17 @@ $(function() {
 									
 											.on("mouseover", function(d, i, e){
 												thing.append("text").text(d.value)
-												.attr("x", xScale.step()/2  + margin.left + xScale.step()  * d.col)
+												.attr("x", xScale.step()/3  + margin.left + xScale.step()  * d.col)
 												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
-												.attr("id", d.value + "r" + i);
+												.attr("id", d.value + "r" + i)
+												.attr("class", "text");
 												
 											})
 											.on("mouseout", function(d, i){
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
 									
-									$(".income").hide();
+									
 									console.log(crimeDivision.regions);
 									
 									
@@ -607,11 +613,14 @@ $(function() {
 										
 										switch(parseInt($("#selection").val())){
 											case 1:
-												console.log("Income by county");
+//												console.log("Income by county");
+												$(".burglary").hide();
+												$(".income").show();
 												break;
 											case 2:
 //												console.log("Something else");
-//												$(".income").hide();
+												$(".income").hide();
+												$(".burglary").show();
 												break;
 											case 3:
 												console.log("Third thingy");
@@ -796,7 +805,7 @@ $(function() {
 									
 									}
 									
-									var burglary_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames, burglaryValues, 0, false);
+									var burglary_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[0], completeCrimeByDivision.mapped, 0, false);
 									console.log(burglary_coords);
 									
 									
@@ -820,15 +829,16 @@ $(function() {
 									
 											.on("mouseover", function(d, i, e){
 												thing.append("text").text(d.value)
-												.attr("x", xScale.step()/2  + margin.left + xScale.step()  * d.col)
+												.attr("x", xScale.step()/3  + margin.left + xScale.step()  * d.col)
 												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
-												.attr("id", d.value + "r" + i);
+												.attr("id", d.value + "r" + i)
+												.attr("class", "text");
 												
 											})
 											.on("mouseout", function(d, i){
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
-									
+									$(".burglary").hide();
 //									incomeByCounty.counties = getData(county_raw, "values");
 //									incomeByCounty.incomeTypes = getData(income_types_raw, "values");
 //									incomeByCounty.years = getData(years_raw, "values");
