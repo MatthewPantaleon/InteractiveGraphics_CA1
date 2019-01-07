@@ -577,8 +577,7 @@ $(function() {
 											.enter()
 											.append("rect")
 											.transition()
-											
-											.delay(function(d, i){ return 10 * i;})
+											.delay(function(d, i){ return 7 * i;})
 											.attr("x", function(d){
 												return 3 + margin.left + xScale.step() * d.col;
 											})
@@ -590,17 +589,36 @@ $(function() {
 											.attr("fill", function(d){
 												return getColour(incomeByCounty_coords, d.value, averageDisposableIncome, 2, 10);
 											})
+											.attr("id", function(d, i){return  d.value + "r" + d.col + "c" + d.row;})
+//											.on("mouseover", function(d, i, e){
+//												thing.append("text").text(d.value)
+//												.attr("x", xScale.step()/3  + margin.left + xScale.step()  * d.col)
+//												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
+//												.attr("id", d.value + "r" + i)
+//												.attr("class", "text");
+//												
+//											})
+//											.on("mouseout", function(d, i){
+//												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
+//											});
 									
-											.on("mouseover", function(d, i, e){
-												thing.append("text").text(d.value)
-												.attr("x", xScale.step()/3  + margin.left + xScale.step()  * d.col)
-												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
-												.attr("id", d.value + "r" + i)
-												.attr("class", "text");
-												
-											})
-											.on("mouseout", function(d, i){
-												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
+											$(".income rect, .burglary rect").on("mouseover", function(e){
+												var id = this.id.split("r")[0];
+												var row = this.id.substring(this.id.lastIndexOf("r") + 1, this.id.lastIndexOf("c"));
+												var col = this.id.substring(this.id.lastIndexOf("c") + 1);
+
+												thing.append("text").text(id)
+													.attr("x", xScale.step()/3  + margin.left + xScale.step()  * row)
+													.attr("y", yScale.step()/2 + margin.top + yScale.step() * col)
+													.attr("id", id + "r" + row)
+													.attr("class", "text");
+											});
+									
+											$(".income rect, .burglary rect").on("mouseout", function(e){
+												var id = this.id.split("r")[0];
+												var row = this.id.substring(this.id.lastIndexOf("r") + 1, this.id.lastIndexOf("c"));
+												var col = this.id.substring(this.id.lastIndexOf("c") + 1);
+												d3.select('[id="' + id + 'r' + row + '"]').remove();
 											});
 									
 									
@@ -815,6 +833,7 @@ $(function() {
 											.data(burglary_coords)
 											.enter()
 											.append("rect")
+									
 											.attr("x", function(d){
 												return 3 + margin.left + xScale.step() * d.col;
 											})
