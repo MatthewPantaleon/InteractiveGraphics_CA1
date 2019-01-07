@@ -843,12 +843,12 @@ $(function() {//ready function
 									crimeDivisionTruncateCrime.mapped = [];
 
 									
-									var testComplete = [];
 									crimeDivisionTruncateCrime.mapped = trim(crimeDivisionYear, selectIndex, "regions", "crimeType");
 									console.log(crimeDivisionYear.mapped);
 									
 									var crimeNames = ["Burglary and related offences", "Theft and related offences", "Fraud, deception and related offences", "Controlled drug offences"];
 									
+									//referencing garda divisions onto counties. Some values are allocated to different counties due to the nature of the original dataset
 									
 //									25: "Carlow", 
 //									1: "Cavan", 
@@ -881,6 +881,7 @@ $(function() {//ready function
 									var completeCrimeByDivision = {};
 									
 									
+									//completeCrimeByDivision.mapped contains all the data for all four crime types.
 									completeCrimeByDivision.mapped = trim(crimeDivisionYear, crimeRegionSelect, "regions");
 									console.log(completeCrimeByDivision.mapped);
 									
@@ -1028,6 +1029,7 @@ $(function() {//ready function
 //									incomeByCounty.mapped = masterArray(years_raw, income_types_raw, county_raw, "keys", "values", income_values_raw);
 //									incomeByCounty.values = income_values_raw;
 									var testingArray = [0, 1, 2];
+									var testComplete = [];
 									testComplete = trim(incomeByCounty, testingArray, "counties");
 									
 									var theft_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[2], completeCrimeByDivision.mapped, 0, false);
