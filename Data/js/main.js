@@ -41,28 +41,45 @@ $(function() {
 		attrubute3 -> third array to dertermine which value to select. Array
 		valueArray -> array of all values to extract from. Array
 		index -> number to determine which index in attribute3 to select the value. Integer
+		alternative -> if the data is structured differently use alternative coordinates. Boolean
 	*/
-	function heatMap(attribute1, attribute2, attribute3, valueArray, index){
+	function heatMap(attribute1, attribute2, attribute3, valueArray, index, alternative){
 		
 		var coords = [];
 		var increment = 0;
-		
-		for(var d = 0; d < attribute1.length; d++){
-			
-			for(var dd = 0; dd < attribute2.length; dd++){
-				coords.push({
-					row: d, 
-					col: dd, 
-					value: valueArray[index + (attribute3.length * increment)],
-					valueName: attribute3[index]
-				});
-				//console.log(coords[d * dd].value);
-				increment++;
+		if(alternative){
+			for(var d = 0; d < attribute1.length; d++){
+
+				for(var dd = 0; dd < attribute2.length; dd++){
+					coords.push({
+						row: d, 
+						col: dd, 
+						value: valueArray[index + (attribute3.length * increment)],
+						valueName: attribute3[index]
+					});
+					//console.log(coords[d * dd].value);
+					increment++;
+				}
+			}
+		}else if(!alternative){
+			for(var d = 0; d < attribute1.length; d++){
+
+				for(var dd = 0; dd < attribute2.length; dd++){
+					
+					coords.push({
+						row: d, 
+						col: dd, 
+						value: valueArray[increment],
+						valueName: attribute3[index]
+					});
+					//console.log(coords[d * dd].value);
+					increment++;
+				}
 			}
 		}
+		
 		return coords;
 	}
-	
 	
 	//merge everything into a useable dataset
 	/*
@@ -150,25 +167,62 @@ $(function() {
 		return truncatedArray;
 	}
 	
-	//average values if two value sets belong to one entity/county
-	function merge(){
-		
-	}
 	
 	
 	//trim off unwated data in the master array
-	function trim(Master, ){
+	/*
+		Master -> master object containing mapped array. Object
+		excluder -> array to select or deselect from the mapped array. Array
+		attr1 -> name of first attribute that each data point is defined with. String
+		arrt2 -> name of second attribute that each data point is defined with. String (optional)
+	*/
+	function trim(Master, excluder, attr1, attr2){
 		var newMapped = [];
 		
-		for(var cdr = 0; cdr < crimeDivisionYear.regions.length; cdr++){
-			for(var cdy = 0; cdy < crimeDivision.crimeType.length; cdy++){
-				if(!selectIndex.includes(cdy)){
-					delete crimeDivisionYear.mapped[cdr][crimeDivisionYear.crimeType[cdy]];
+		
+		if(attr2 != undefined || attr2 != null){
+			for(var cdr = 0; cdr < Master[attr1].length; cdr++){
+			
+				for(var cdy = 0; cdy < Master[attr2].length; cdy++){
+					if(!excluder.includes(cdy)){
+						delete Master.mapped[cdr][Master[attr2][cdy]];
 
+					}
 				}
+			}
+		}else{
+			for(var ex = 0; ex < excluder.length; ex++){
+				newMapped.push(Master.mapped[excluder[ex]]);
 			}
 		}
 		
+		
+		return newMapped;
+		
+	}
+	
+	//reevaluate values array for use in heatmap. Uses new Trimmed mapped array
+	function evaluate(Master, attrArray1, attrArray2){
+		var newValues = [];
+		for(var m = 0; m < Master.mapped.length; m++){
+//			console.log(m);
+			for(var m2 = 0; m2 < attrArray1.length; m2++){
+//				console.log(m2);
+				for(var m3 = 0; m3 < attrArray2.length; m3++){
+//					console.log(m3);
+//					console.log(Master.mapped[m][attrArray1[m2]][attrArray2[m3]]);
+					//console.log(attrArray2[m3]);
+					if(Master.mapped[m][attrArray1[m2]][attrArray2[m3]] !== undefined){
+						newValues.push(Master.mapped[m][attrArray1[m2]][attrArray2[m3]]);
+					}else{
+						//newValues.push(undefined);
+					}
+					
+				}
+			}
+			
+		}
+		return newValues;
 	}
 	
 	var initialise = true;
@@ -416,12 +470,47 @@ $(function() {
 									var height = 300 - margin.top - margin.bottom;
 									
 									
+//									31: "Carlow", 
+//									7: "Cavan", 
+//									28: "Clare",
+//									1: "Cork",
+//									8: "Donegal",
+//									22: "Dublin",
+//									2: "Galway",
+//									36: "Kerry",
+//									24: "Kildare",
+//									32: "KilKenny",
+//									14: "Laois",
+//									9: "Leitrim",
+//									3: "Limerick",
+//									15: "Longford",
+//									10: "Louth",
+//									19: "Mayo",
+//									25: "Meath",
+//									11: "Monaghan",
+//									16: "Offaly",
+//									20: "Roscommon",
+//									12: "Sligo",
+//									29/33: "Tipperary",
+//									4: "Waterford",
+//									17: "Westmeath",
+//									34: "Wexford",
+//									26: "Wicklow"
+									
+									var completeIncomeByCounty = {};
+									var selectCounties = [31, 7, 28, 1, 8, 22, 2, 36, 24, 32, 14, 9, 3, 15, 10, 19, 25, 11, 16, 20, 12, 33, 4, 17, 34, 26];
+									completeIncomeByCounty.mapped = trim(incomeByCounty, selectCounties, "counties");
+									
+									console.log(completeIncomeByCounty);
+									completeIncomeByCounty.values = evaluate(completeIncomeByCounty, incomeByCounty.years, incomeByCounty.incomeTypes);
+									
+									console.log(completeIncomeByCounty.values);
 									
 									var xScale = d3.scaleBand().range([margin.left, incomeByCounty.counties.length * itemSize]);
 									var yScale = d3.scaleBand().range([0, incomeByCounty.counties.length * itemSize]);
 									
 									xScale.domain(incomeByCounty.years);
-									yScale.domain(incomeByCounty.counties);
+									yScale.domain(getData(baseCounties, "values"));
 									
 									//graph incometypes axis
 									thing.append("g")
@@ -445,16 +534,17 @@ $(function() {
 									incomeByCounty.newCounties = [];
 									var excludeArray = ["State", "Border, Midland and Western", "Border", "Midland", "West", "Southern and Eastern", "Mid-East", "Mid-West", "South-East", "South-West"];
 									
-									for(var ibc = 0; ibc < incomeByCounty.mapped.length; ibc++){
-										if(!excludeArray.includes(incomeByCounty.counties[ibc])){
-											console.log(incomeByCounty.counties[ibc]);
-											incomeByCounty.newCounties.push(incomeByCounty.counties[ibc]);
-										}
-									}
-									console.log(incomeByCounty.newCounties);
+//									for(var ibc = 0; ibc < incomeByCounty.mapped.length; ibc++){
+//										if(!excludeArray.includes(incomeByCounty.counties[ibc])){
+//											//console.log(incomeByCounty.counties[ibc]);
+//											incomeByCounty.newCounties.push(incomeByCounty.counties[ibc]);
+//										}
+//									}
+//									console.log(incomeByCounty.newCounties);
 									
 									//attribute1, attribute2, valueArray, index
-									var incomeByCounty_coords = heatMap(incomeByCounty.counties, incomeByCounty.years, incomeByCounty.incomeTypes, incomeByCounty.values, 11);
+//									var incomeByCounty_coords = heatMap(incomeByCounty.counties, incomeByCounty.years, incomeByCounty.incomeTypes, incomeByCounty.values, 11);
+									var incomeByCounty_coords = heatMap(countiesArray, incomeByCounty.years, incomeByCounty.incomeTypes, completeIncomeByCounty.values, 11, true);
 									
 									//var incomeMedianRegion_coords = heatMap(incomeMedianByRegion.regions, incomeMedianByRegion.years, incomeMedianByRegion.medians, incomeMedianByRegion.values, 0);
 									
@@ -479,7 +569,7 @@ $(function() {
 									
 									//disposable income by county heatmap
 									thing.append("g")
-											.attr("class", "test")
+											.attr("class", "income")
 											.selectAll()
 											.data(incomeByCounty_coords)
 											.enter()
@@ -507,7 +597,12 @@ $(function() {
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
 									
+									$(".income").hide();
+									console.log(crimeDivision.regions);
 									
+									
+									
+									//dropdown to switch out heatmaps
 									$("#selection").on("change", function(e){
 										
 										switch(parseInt($("#selection").val())){
@@ -515,7 +610,8 @@ $(function() {
 												console.log("Income by county");
 												break;
 											case 2:
-												console.log("Something else");
+//												console.log("Something else");
+//												$(".income").hide();
 												break;
 											case 3:
 												console.log("Third thingy");
@@ -577,47 +673,6 @@ $(function() {
 									
 									var truncatedTest = [];
 									
-//									var testCounter = 0;
-//									var temp = 0;
-//									
-//									for(var t = 0; t < testMaster.mapped.length; t++){
-//										
-//										for(var tt = 0; tt < testMaster.badThings.length; tt++){
-//											//console.log(testMaster.mapped[t][testMaster.badThings[tt]]);
-//											testCounter = 0;
-//											
-//											for(var q = 0; q < Math.ceil(testMaster.quarters.length / testBand) * testBand; q++){
-//												for(var tv = 0; tv < testBand; tv++){
-//													
-//													if((testCounter * testBand) + tv < testMaster.quarters.length){
-//														//temp += testValues[(testCounter * testBand) + tv];
-//														temp += testMaster.mapped[t][testMaster.badThings[tt]][testMaster.quarters[testCounter * testBand + tv]];
-//														console.log(temp);
-//													}else{
-//														break;
-//													}
-//													
-//												}
-//												
-//												if(q < Math.ceil(testMaster.quarters.length / testBand)){
-//													console.log(truncatedTest);
-//													truncatedTest.push(temp);	
-//													temp = 0;
-//												}
-//												testCounter++;
-//											}
-//											
-//											
-//											
-//										}
-//										//testCounter = 0;
-//										
-//										
-//										
-//									}
-									
-									//truncatedTest = truncate(testMaster, "badThings", "quarters", 4);
-									
 									var baseYears ={"2003": "2003",
 													"2004": "2004",
 													"2005": "2005",
@@ -654,22 +709,135 @@ $(function() {
 									
 									var crimeDivisionTruncateCrime = {};
 									crimeDivisionTruncateCrime.mapped = [];
-									for(var cdr = 0; cdr < crimeDivisionYear.regions.length; cdr++){
-										for(var cdy = 0; cdy < crimeDivision.crimeType.length; cdy++){
-											if(!selectIndex.includes(cdy)){
-//												console.log(crimeDivisionYear.mapped[cdr][crimeDivisionYear.crimeType[cdy]]);
-												delete crimeDivisionYear.mapped[cdr][crimeDivisionYear.crimeType[cdy]];
-												
+
+									
+									var testComplete = [];
+									crimeDivisionTruncateCrime.mapped = trim(crimeDivisionYear, selectIndex, "regions", "crimeType");
+									console.log(crimeDivisionYear.mapped);
+									
+									var crimeNames = ["Burglary and related offences", "Theft and related offences", "Fraud, deception and related offences", "Controlled drug offences"];
+									
+									
+//									25: "Carlow", 
+//									1: "Cavan", 
+//									6: "Clare",
+//									11: "Cork",
+//									2: "Donegal",
+//									27: "Dublin",
+//									8: "Galway",
+//									14: "Kerry",
+//									21: "Kildare",
+//									25: "KilKenny",
+//									17: "Laois",
+//									3: "Leitrim",
+//									15: "Limerick",
+//									9: "Longford",
+//									4: "Louth",
+//									7: "Mayo",
+//									18: "Meath",
+//									1: "Monaghan",
+//									17: "Offaly",
+//									9: "Roscommon",
+//									3: "Sligo",
+//									23: "Tipperary",
+//									26: "Waterford",
+//									20: "Westmeath",
+//									24: "Wexford",
+//									26: "Wicklow"
+									
+									var crimeRegionSelect = [25, 1, 6, 11, 2, 27, 8, 14, 21, 25, 9, 3, 15, 9, 4, 7, 18, 1, 17, 9, 3, 23, 26, 20, 24, 26];
+									var completeCrimeByDivision = {};
+									
+									
+									completeCrimeByDivision.mapped = trim(crimeDivisionYear, crimeRegionSelect, "regions");
+									console.log(completeCrimeByDivision.mapped);
+									
+									
+									//heatMap(attribute1, attribute2, attribute3, valueArray, index)
+									//countiesArray, incomeByCounty.years
+									
+									
+									var averageBurglaries = 0;
+									var totalBurglaries = 0;
+									
+									console.log(totalBurglaries);
+									averageBurglaries = Math.floor(totalBurglaries / (incomeByCounty.years.length * countiesArray.length));
+									console.log(averageBurglaries);
+									
+									//remove excess years
+									var removeYears = ["2016", "2017", "2018"];
+									for(var y = 0; y < completeCrimeByDivision.mapped.length; y++){
+										for(var re = 0; re < crimeNames.length; re++){
+											for(var ye = 0; ye < removeYears.length; ye++){
+												delete completeCrimeByDivision.mapped[y][crimeNames[re]][removeYears[ye]];
 											}
 										}
 									}
-									console.log(crimeDivisionYear.mapped);
 									
-									var regionExclude = [0, 5, 10, 16, 22 ];
-									
-									for(var cdr2 = 0; cdr2 <  crimeDivisionYear.regions.length; cdr2++){
-//										if(){}
+									//add in dummy data to align crime data to income data
+									var addYears = ["2000", "2001", "2002"];
+									for(var y = 0; y < completeCrimeByDivision.mapped.length; y++){
+										for(var re = 0; re < crimeNames.length; re++){
+											for(var ye = 0; ye < addYears.length; ye++){
+												completeCrimeByDivision.mapped[y][crimeNames[re]][addYears[ye]] = 0;
+											}
+										}
 									}
+									
+									console.log(completeCrimeByDivision);
+									var burglaryValues = evaluate(completeCrimeByDivision, crimeNames, incomeByCounty.years);
+									console.log(burglaryValues);
+									
+									for(var bq = 0; bq < completeCrimeByDivision.mapped.length; bq++){
+										
+										for(var bqq = 0; bqq < incomeByCounty.years.length; bqq++){
+											totalBurglaries += completeCrimeByDivision.mapped[bq][crimeNames[0]][incomeByCounty.years[bqq]];
+										}
+									
+									}
+									
+									var burglary_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames, burglaryValues, 0, false);
+									console.log(burglary_coords);
+									
+									
+									thing.append("g")
+											.attr("class", "burglary")
+											.selectAll()
+											.data(burglary_coords)
+											.enter()
+											.append("rect")
+											.attr("x", function(d){
+												return 3 + margin.left + xScale.step() * d.col;
+											})
+											.attr("y", function(d){
+												return 3 + margin.top + yScale.step() * d.row;
+											})
+											.attr("width", xScale.step() - 2)
+											.attr("height", yScale.step() - 2)
+											.attr("fill", function(d){
+												return getColour(burglary_coords, d.value, averageBurglaries, 2, 10);
+											})
+									
+											.on("mouseover", function(d, i, e){
+												thing.append("text").text(d.value)
+												.attr("x", xScale.step()/2  + margin.left + xScale.step()  * d.col)
+												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
+												.attr("id", d.value + "r" + i);
+												
+											})
+											.on("mouseout", function(d, i){
+												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
+											});
+									
+//									incomeByCounty.counties = getData(county_raw, "values");
+//									incomeByCounty.incomeTypes = getData(income_types_raw, "values");
+//									incomeByCounty.years = getData(years_raw, "values");
+//									incomeByCounty.mapped = masterArray(years_raw, income_types_raw, county_raw, "keys", "values", income_values_raw);
+//									incomeByCounty.values = income_values_raw;
+									var testingArray = [0, 1, 2];
+									testComplete = trim(incomeByCounty, testingArray, "counties");
+									
+									
 									
 									
 								});
