@@ -466,7 +466,7 @@ $(function() {
 									
 									var itemSize = 25;
 									var cellSize = itemSize - 1;
-									var margin = {left: 100, right: 50, top: 50, bottom: 50};
+									var margin = {left: 80, right: 50, top: 50, bottom: 50};
 									
 									var width = 750 - margin.right - margin.left;
 									var height = 300 - margin.top - margin.bottom;
@@ -568,7 +568,7 @@ $(function() {
 									
 									console.log(incomeByCounty_coords);
 									
-									
+									var transitionStart = 0;
 									//disposable income by county heatmap
 									thing.append("g")
 											.attr("class", "income")
@@ -576,8 +576,12 @@ $(function() {
 											.data(incomeByCounty_coords)
 											.enter()
 											.append("rect")
+											.style("opacity", 0)
+											.attr("x", margin.left)
+											.attr("y", margin.top)
 											.transition()
-											.delay(function(d, i){ return 7 * i;})
+											.delay(function(d, i){return 3 * i;})
+											.style("opacity", 1)
 											.attr("x", function(d){
 												return 3 + margin.left + xScale.step() * d.col;
 											})
@@ -602,7 +606,8 @@ $(function() {
 //												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 //											});
 									
-											$(".income rect, .burglary rect").on("mouseover", function(e){
+											//on hover for first heatmap
+											$(".income rect").on("mouseover", function(e){
 												var id = this.id.split("r")[0];
 												var row = this.id.substring(this.id.lastIndexOf("r") + 1, this.id.lastIndexOf("c"));
 												var col = this.id.substring(this.id.lastIndexOf("c") + 1);
@@ -614,7 +619,7 @@ $(function() {
 													.attr("class", "text");
 											});
 									
-											$(".income rect, .burglary rect").on("mouseout", function(e){
+											$(".income rect").on("mouseout", function(e){
 												var id = this.id.split("r")[0];
 												var row = this.id.substring(this.id.lastIndexOf("r") + 1, this.id.lastIndexOf("c"));
 												var col = this.id.substring(this.id.lastIndexOf("c") + 1);
@@ -624,7 +629,9 @@ $(function() {
 									
 									console.log(crimeDivision.regions);
 									
-									
+									$(".theft-text").hide();
+									$(".fraud-text").hide();
+									$(".burglary-text").hide();
 									
 									//dropdown to switch out heatmaps
 									$("#selection").on("change", function(e){
@@ -632,19 +639,52 @@ $(function() {
 										switch(parseInt($("#selection").val())){
 											case 1:
 //												console.log("Income by county");
-												$(".burglary").hide();
-												$(".income").show();
+												$(".theft").fadeOut();
+												$(".fraud").fadeOut();
+												$(".burglary").fadeOut();
+												$(".income").fadeIn();
+												
+												$(".theft-text").hide();
+												$(".fraud-text").hide();
+												$(".burglary-text").hide();
+												$(".income-text").show();
 												break;
 											case 2:
 //												console.log("Something else");
-												$(".income").hide();
-												$(".burglary").show();
+												$(".theft").fadeOut();
+												$(".fraud").fadeOut();
+												$(".income").fadeOut();
+												$(".burglary").fadeIn();
+												
+												$(".theft-text").hide();
+												$(".fraud-text").hide();
+												$(".income-text").hide();
+												$(".burglary-text").show();
 												break;
 											case 3:
-												console.log("Third thingy");
+//												console.log("Third thingy");
+												$(".theft").fadeOut();
+												$(".burglary").fadeOut();
+												$(".income").fadeOut();
+												$(".fraud").fadeIn();
+											
+												$(".theft-text").hide();
+												$(".burglary-text").hide();
+												$(".income-text").hide();
+												$(".fraud-text").show();
+												
 												break;
 											case 4:
-												console.log("The final thingy");
+//												console.log("The final thingy");
+												$(".burglary").fadeOut();
+												$(".income").fadeOut();
+												$(".fraud").fadeOut();
+												$(".theft").fadeIn();
+												
+												$(".burglary-text").hide();
+												$(".income-text").hide();
+												$(".fraud-text").hide();
+												$(".theft-text").show();
 												break;
 											default:
 												console.log("You shouldn't be here");
@@ -652,6 +692,9 @@ $(function() {
 										}
 										
 									});
+									//
+									//testing objects to test truncate function, to add up quarters to form years
+									//
 									
 									//masterArray(crime_type, yearly_quarters, garda_division, "values", "values", crime_total);
 									var areas = {10: "location_1", 20: "location_2", 30: "location_3"};
@@ -787,9 +830,7 @@ $(function() {
 									var averageBurglaries = 0;
 									var totalBurglaries = 0;
 									
-									console.log(totalBurglaries);
-									averageBurglaries = Math.floor(totalBurglaries / (incomeByCounty.years.length * countiesArray.length));
-									console.log(averageBurglaries);
+									
 									
 									//remove excess years
 									var removeYears = ["2016", "2017", "2018"];
@@ -823,6 +864,11 @@ $(function() {
 									
 									}
 									
+									
+									console.log(totalBurglaries);
+									averageBurglaries = Math.floor(totalBurglaries / (incomeByCounty.years.length * countiesArray.length));
+									console.log(averageBurglaries);
+									
 									var burglary_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[0], completeCrimeByDivision.mapped, 0, false);
 									console.log(burglary_coords);
 									
@@ -833,7 +879,7 @@ $(function() {
 											.data(burglary_coords)
 											.enter()
 											.append("rect")
-									
+											
 											.attr("x", function(d){
 												return 3 + margin.left + xScale.step() * d.col;
 											})
@@ -858,6 +904,56 @@ $(function() {
 												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
 											});
 									$(".burglary").hide();
+									
+									var fraud_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[1], completeCrimeByDivision.mapped, 0, false);
+									
+									var averageFraud = 0;
+									var totalFraud = 0;
+									
+									console.log(fraud_coords);
+									
+									for(var bq = 0; bq < completeCrimeByDivision.mapped.length; bq++){
+										
+										for(var bqq = 0; bqq < incomeByCounty.years.length; bqq++){
+											totalFraud += completeCrimeByDivision.mapped[bq][crimeNames[1]][incomeByCounty.years[bqq]];
+										}
+									
+									}
+									console.log(totalFraud);
+									averageFraud = Math.floor(totalFraud / (incomeByCounty.years.length * countiesArray.length));
+									console.log(averageFraud);
+									
+									thing.append("g")
+											.attr("class", "fraud")
+											.selectAll()
+											.data(fraud_coords)
+											.enter()
+											.append("rect")
+											
+											.attr("x", function(d){
+												return 3 + margin.left + xScale.step() * d.col;
+											})
+											.attr("y", function(d){
+												return 3 + margin.top + yScale.step() * d.row;
+											})
+											.attr("width", xScale.step() - 2)
+											.attr("height", yScale.step() - 2)
+											.attr("fill", function(d){
+												return getColour(fraud_coords, d.value, averageFraud, 2, 10);
+											})
+									
+											.on("mouseover", function(d, i, e){
+												thing.append("text").text(d.value)
+												.attr("x", xScale.step()/3  + margin.left + xScale.step()  * d.col)
+												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
+												.attr("id", d.value + "r" + i)
+												.attr("class", "text");
+												
+											})
+											.on("mouseout", function(d, i){
+												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
+											});
+									$(".fraud").hide();
 //									incomeByCounty.counties = getData(county_raw, "values");
 //									incomeByCounty.incomeTypes = getData(income_types_raw, "values");
 //									incomeByCounty.years = getData(years_raw, "values");
@@ -866,6 +962,55 @@ $(function() {
 									var testingArray = [0, 1, 2];
 									testComplete = trim(incomeByCounty, testingArray, "counties");
 									
+									var theft_coords = heatMap(countiesArray, incomeByCounty.years, crimeNames[2], completeCrimeByDivision.mapped, 0, false);
+									console.log(theft_coords);
+									
+									var averageTheft = 0;
+									var totalTheft = 0;
+									
+									for(var bq = 0; bq < completeCrimeByDivision.mapped.length; bq++){
+										
+										for(var bqq = 0; bqq < incomeByCounty.years.length; bqq++){
+											totalTheft += completeCrimeByDivision.mapped[bq][crimeNames[2]][incomeByCounty.years[bqq]];
+										}
+									
+									}
+									console.log(totalTheft);
+									averageTheft = Math.floor(totalTheft / (incomeByCounty.years.length * countiesArray.length));
+									console.log(averageTheft);
+									
+									
+									thing.append("g")
+											.attr("class", "theft")
+											.selectAll()
+											.data(theft_coords)
+											.enter()
+											.append("rect")
+											
+											.attr("x", function(d){
+												return 3 + margin.left + xScale.step() * d.col;
+											})
+											.attr("y", function(d){
+												return 3 + margin.top + yScale.step() * d.row;
+											})
+											.attr("width", xScale.step() - 2)
+											.attr("height", yScale.step() - 2)
+											.attr("fill", function(d){
+												return getColour(theft_coords, d.value, averageTheft, 2, 10);
+											})
+									
+											.on("mouseover", function(d, i, e){
+												thing.append("text").text(d.value)
+												.attr("x", xScale.step()/3  + margin.left + xScale.step()  * d.col)
+												.attr("y", yScale.step()/2 + margin.top + yScale.step() * d.row)
+												.attr("id", d.value + "r" + i)
+												.attr("class", "text");
+												
+											})
+											.on("mouseout", function(d, i){
+												d3.select('[id="' + d.value + 'r' + i + '"]').remove();
+											});
+									$(".theft").hide();
 									
 									
 									

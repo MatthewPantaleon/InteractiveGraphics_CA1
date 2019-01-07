@@ -28,11 +28,39 @@
 		
 	</style>
 <body>
-    <div class="container">
-		<div class="row justify-content-center">
+    <div class="container mt-5">
+		
+		
+		<div class="row income-text justify-content-center">
+			<div class="col-10">
+				<h2>Income</h2>
+			</div>
 			
-			<div class="col">
-				<select id="selection">
+		</div>
+		<div class="row burglary-text justify-content-center">
+			<div class="col-10">
+				<h2>Burglary</h2>
+			</div>
+		</div>
+		<div class="row fraud-text justify-content-center">
+			<div class="col-10">
+				<h2>Fraud</h2>
+			</div>
+			
+		</div>
+		<div class="row theft-text justify-content-center">
+			<div class="col-10">
+				<h2>Theft</h2>
+			</div>
+		</div>
+		
+		
+		<div class="row justify-content-left">
+			<div class="col-1">
+			</div>
+			
+			<div class="col-3">
+				<select id="selection" class="custom-select">
 					<option value="1">Income By County</option>
 					<option value="2">Burglary Rates</option>
 					<option value="3">Fraud Rates</option>
@@ -40,15 +68,15 @@
 				</select>
 			</div>
 		</div>
-	
+		<!-- Append SVG here -->
 		<div class="row">
-			<div class="col svgHere">
+			<div class="col-10 svgHere justify-content-center">
 				
 			</div>
 		</div>
 	
 	</div>
-      
+    
 	<script src="js/main.js"></script>
 </body>
 </html>
